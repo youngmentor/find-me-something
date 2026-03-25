@@ -1,5 +1,6 @@
 const socialLinksSchema = {
   type: 'object',
+  minProperties: 1,
   properties: {
     website: {
       type: 'string',
@@ -129,6 +130,25 @@ const errorSchema = {
   }
 } as const;
 
+const publicDonationStatusSchema = {
+  type: 'object',
+  required: ['username', 'isOnboarded', 'isReadyToAcceptDonations'],
+  properties: {
+    username: {
+      type: 'string',
+      example: 'toyin_codes'
+    },
+    isOnboarded: {
+      type: 'boolean',
+      example: true
+    },
+    isReadyToAcceptDonations: {
+      type: 'boolean',
+      example: true
+    }
+  }
+} as const;
+
 export const openApiSpec = {
   openapi: '3.0.3',
   info: {
@@ -170,6 +190,7 @@ export const openApiSpec = {
       NairaPayoutAccount: nairaPayoutAccountSchema,
       UserMeta: userMetaSchema,
       User: userSchema,
+      PublicDonationStatusResponse: publicDonationStatusSchema,
       RegisterRequest: {
         type: 'object',
         required: ['fullName', 'email', 'password'],
@@ -430,6 +451,48 @@ export const openApiSpec = {
           },
           '401': {
             description: 'Invalid credentials',
+            content: {
+              'application/json': {
+                schema: {
+                  $ref: '#/components/schemas/ErrorResponse'
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    '/api/v1/users/{username}/donation-status': {
+      get: {
+        tags: ['Users'],
+        summary: 'Check whether a creator is ready to receive donations',
+        parameters: [
+          {
+            in: 'path',
+            name: 'username',
+            required: true,
+            schema: {
+              type: 'string',
+              pattern: '^[a-z0-9_]+$',
+              minLength: 3,
+              maxLength: 30
+            },
+            example: 'toyin_codes'
+          }
+        ],
+        responses: {
+          '200': {
+            description: 'Creator donation readiness status',
+            content: {
+              'application/json': {
+                schema: {
+                  $ref: '#/components/schemas/PublicDonationStatusResponse'
+                }
+              }
+            }
+          },
+          '404': {
+            description: 'User not found',
             content: {
               'application/json': {
                 schema: {

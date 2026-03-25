@@ -56,13 +56,15 @@ npm run dev
 2. Run `POST /api/v1/auth/register` with `fullName`, `email`, and `password`.
 3. Run `POST /api/v1/auth/login` and copy the returned JWT.
 4. Click `Authorize` in Swagger UI and paste the JWT value.
-5. Call `PATCH /api/v1/users/onboard` to add username, bio, social links, and naira payout details.
+5. Call `PATCH /api/v1/users/onboard` to add username, bio, at least one social link, and naira payout details.
 6. Call `GET /api/v1/users/me`.
+7. Call `GET /api/v1/users/{username}/donation-status` to check whether a creator is ready to receive donations.
 
 ## API overview
 
 - `GET /health` - health check
 - `POST /api/v1/auth/register` - create a basic account
 - `POST /api/v1/auth/login` - authenticate and receive a JWT
+- `GET /api/v1/users/:username/donation-status` - public readiness check for creator donations
 - `PATCH /api/v1/users/onboard` - complete the creator onboarding profile
 - `GET /api/v1/users/me` - fetch the authenticated user profile

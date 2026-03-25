@@ -1,5 +1,6 @@
 import { AppError } from '../../common/errors/app-error';
 import {
+  type IUser,
   User,
   type NairaPayoutAccount,
   type SocialLinks,
@@ -12,6 +13,34 @@ interface OnboardUserInput {
   socialLinks: SocialLinks;
   nairaPayoutAccount: NairaPayoutAccount;
 }
+
+interface PublicDonationStatus {
+  username: string;
+  isOnboarded: boolean;
+  isReadyToAcceptDonations: boolean;
+}
+
+const hasAtLeastOneSocialLink = (socialLinks: SocialLinks | undefined): boolean =>
+  Object.values(socialLinks ?? {}).some(
+    (link) => typeof link === 'string' && link.trim().length > 0
+  );
+
+const hasValidNairaPayoutAccount = (
+  payoutAccount: NairaPayoutAccount | undefined
+): payoutAccount is NairaPayoutAccount =>
+  Boolean(
+    payoutAccount?.bankCode?.trim() &&
+      payoutAccount.bankName?.trim() &&
+      payoutAccount.accountName?.trim() &&
+      payoutAccount.accountNumber?.trim()
+  );
+
+const computeDonationReadiness = (
+  user: Pick<IUser, 'username' | 'meta'>
+): boolean =>
+  Boolean(user.username?.trim()) &&
+  hasAtLeastOneSocialLink(user.meta.socialLinks) &&
+  hasValidNairaPayoutAccount(user.meta.nairaPayoutAccount);
 
 export const getUserProfileById = async (userId: string): Promise<UserDocument> => {
   const user = await User.findById(userId);
@@ -45,14 +74,33 @@ export const onboardUser = async (
   user.set({
     username: input.username,
     bio: input.bio,
-    isOnboarded: true,
     meta: {
       socialLinks: input.socialLinks,
       nairaPayoutAccount: input.nairaPayoutAccount
     }
   });
 
+  user.isOnboarded = computeDonationReadiness(user);
+
   await user.save();
 
   return user;
+};
+
+export const getPublicDonationStatusByUsername = async (
+  username: string
+): Promise<PublicDonationStatus> => {
+  const user = await User.findOne({ username });
+
+  if (!user) {
+    throw new AppError(404, 'User not found.');
+  }
+
+  const isReadyToAcceptDonations = computeDonationReadiness(user);
+
+  return {
+    username: user.username ?? username,
+    isOnboarded: isReadyToAcceptDonations,
+    isReadyToAcceptDonations
+  };
 };
