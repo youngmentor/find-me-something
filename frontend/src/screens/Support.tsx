@@ -1,3 +1,5 @@
+import { useForm } from 'react-hook-form'
+
 const toolkit = [
   {
     title: 'Deep Web Scraper Pro',
@@ -13,7 +15,27 @@ const toolkit = [
 
 const tags = ['Sourcing', 'Product Research', 'Design History']
 
+type SupportForm = {
+  amount: string
+  name: string
+  note: string
+}
+
 export default function Support() {
+  const { register, handleSubmit, setValue, watch } = useForm<SupportForm>({
+    defaultValues: {
+      amount: '$10',
+      name: '',
+      note: '',
+    },
+  })
+
+  const selectedAmount = watch('amount')
+
+  const onSubmit = (data: SupportForm) => {
+    console.log('Support sent', data)
+  }
+
   return (
     <section className="space-y-10 pb-20">
       <div className="mx-auto w-full max-w-6xl px-6 pt-10">
@@ -92,25 +114,34 @@ export default function Support() {
             </div>
           </div>
 
-          <div className="rounded-[32px] bg-white p-6 shadow-[0_30px_70px_-55px_rgba(31,28,26,0.7)]">
+          <form
+            className="rounded-[32px] bg-white p-6 shadow-[0_30px_70px_-55px_rgba(31,28,26,0.7)]"
+            onSubmit={handleSubmit(onSubmit)}
+          >
             <h2 className="text-xl font-semibold">Support the Craft</h2>
-            <p className="mt-2 text-sm text-[#7a6558]">
-              Fuel the search for extraordinary things.
-            </p>
+            <p className="mt-2 text-sm text-[#7a6558]">Fuel the search for extraordinary things.</p>
             <div className="mt-6 flex flex-wrap gap-3">
               {['$5', '$10', '$25', 'Custom'].map((amount) => (
                 <button
                   key={amount}
-                  className="rounded-full border border-[#e6d9cc] bg-[#f2f3ff] px-4 py-2 text-xs font-semibold text-[#1f1c1a] hover:border-[#1f1c1a]"
+                  type="button"
+                  onClick={() => setValue('amount', amount)}
+                  className={`rounded-full border px-4 py-2 text-xs font-semibold transition ${
+                    selectedAmount === amount
+                      ? 'border-[#1f1c1a] bg-[#1f1c1a] text-white'
+                      : 'border-[#e6d9cc] bg-[#f2f3ff] text-[#1f1c1a] hover:border-[#1f1c1a]'
+                  }`}
                 >
                   {amount}
                 </button>
               ))}
             </div>
+            <input type="hidden" {...register('amount')} />
             <div className="mt-6 space-y-4 text-xs font-semibold uppercase tracking-[0.2em] text-[#8a776b]">
               <label className="block">
                 Your name (optional)
                 <input
+                  {...register('name')}
                   className="mt-2 w-full rounded-2xl border border-[#e6d9cc] bg-[#f2f3ff] px-4 py-3 text-sm font-normal text-[#1f1c1a]"
                   placeholder="Anonymous Curator"
                 />
@@ -118,6 +149,7 @@ export default function Support() {
               <label className="block">
                 Leave a note
                 <textarea
+                  {...register('note')}
                   className="mt-2 min-h-[120px] w-full rounded-2xl border border-[#e6d9cc] bg-[#f2f3ff] px-4 py-3 text-sm font-normal text-[#1f1c1a]"
                   placeholder="I'm looking for a specific Bauhaus chair..."
                 />
@@ -129,7 +161,7 @@ export default function Support() {
             <p className="mt-4 text-center text-[10px] font-semibold uppercase tracking-[0.2em] text-[#a38f7d]">
               Secured by Interswitch payments
             </p>
-          </div>
+          </form>
         </div>
       </div>
     </section>
