@@ -1,4 +1,25 @@
+import { Link } from 'react-router-dom'
+import { useForm } from 'react-hook-form'
+
+type SignUpForm = {
+  fullName: string
+  email: string
+  password: string
+}
+
 export default function SignUp() {
+  const { register, handleSubmit } = useForm<SignUpForm>({
+    defaultValues: {
+      fullName: '',
+      email: '',
+      password: '',
+    },
+  })
+
+  const onSubmit = (data: SignUpForm) => {
+    console.log('Sign up', data)
+  }
+
   return (
     <section className="section-pad">
       <div className="mx-auto grid w-full max-w-6xl items-center gap-12 px-6 md:grid-cols-2">
@@ -21,23 +42,26 @@ export default function SignUp() {
 
         <div className="glass-card rounded-3xl p-7">
           <p className="text-lg font-semibold">Create your account</p>
-          <form className="mt-6 space-y-4 text-sm">
+          <form className="mt-6 space-y-4 text-sm" onSubmit={handleSubmit(onSubmit)}>
             <label className="block">
               <span className="text-xs font-semibold uppercase tracking-[0.2em] text-[#8a776b]">
                 Full name
               </span>
               <input
+                {...register('fullName')}
                 className="mt-2 w-full rounded-2xl border border-[#e6d9cc] bg-white px-4 py-3 outline-none focus:border-[#1f1c1a]"
                 placeholder="Ada Lovelace"
               />
             </label>
             <label className="block">
               <span className="text-xs font-semibold uppercase tracking-[0.2em] text-[#8a776b]">
-                email
+                Email
               </span>
               <input
+                {...register('email')}
                 className="mt-2 w-full rounded-2xl border border-[#e6d9cc] bg-white px-4 py-3 outline-none focus:border-[#1f1c1a]"
                 placeholder="ada@opensource.dev"
+                type="email"
               />
             </label>
             <label className="block">
@@ -45,6 +69,7 @@ export default function SignUp() {
                 Password
               </span>
               <input
+                {...register('password')}
                 className="mt-2 w-full rounded-2xl border border-[#e6d9cc] bg-white px-4 py-3 outline-none focus:border-[#1f1c1a]"
                 placeholder="Create a strong password"
                 type="password"
@@ -55,6 +80,12 @@ export default function SignUp() {
             </button>
             <p className="text-xs text-[#7a6558]">
               By continuing you agree to receive product updates and payout notifications.
+            </p>
+            <p className="text-xs text-[#7a6558]">
+              Already have an account?{' '}
+              <Link className="font-semibold text-[#d76b4d]" to="/login">
+                Log in
+              </Link>
             </p>
           </form>
         </div>

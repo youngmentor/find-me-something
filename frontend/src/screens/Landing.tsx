@@ -1,3 +1,14 @@
+import { useEffect, useState } from 'react'
+
+const typewriterWords = [
+  'free tools',
+  'open-source projects',
+  'developer toolkits',
+  'indie maker apps',
+  'digital craftsmanship',
+  'side project gems',
+]
+
 const howItWorks = [
   {
     title: 'List your tool',
@@ -66,6 +77,31 @@ const testimonials = [
 ]
 
 export default function Landing() {
+  const [wordIndex, setWordIndex] = useState(0)
+  const [subIndex, setSubIndex] = useState(0)
+  const [isDeleting, setIsDeleting] = useState(false)
+
+  useEffect(() => {
+    const currentWord = typewriterWords[wordIndex]
+    let timeoutId: number
+
+    if (!isDeleting && subIndex === currentWord.length) {
+      timeoutId = window.setTimeout(() => setIsDeleting(true), 1200)
+    } else if (isDeleting && subIndex === 0) {
+      timeoutId = window.setTimeout(() => {
+        setIsDeleting(false)
+        setWordIndex((prev) => (prev + 1) % typewriterWords.length)
+      }, 300)
+    } else {
+      timeoutId = window.setTimeout(
+        () => setSubIndex((prev) => prev + (isDeleting ? -1 : 1)),
+        isDeleting ? 45 : 90,
+      )
+    }
+
+    return () => window.clearTimeout(timeoutId)
+  }, [isDeleting, subIndex, wordIndex])
+
   return (
     <section className="space-y-20 pb-20">
       <div className="mx-auto w-full max-w-6xl px-6 pt-16">
@@ -76,7 +112,10 @@ export default function Landing() {
             </span>
             <h1 className="text-4xl font-semibold leading-tight text-[#1f1c1a] md:text-5xl">
               Receive support for your{' '}
-              <span className="text-[#d76b4d]">free tools</span>
+              <span className="text-[#d76b4d]">
+                {typewriterWords[wordIndex].slice(0, subIndex)}
+                <span className="ml-1 inline-block h-6 w-0.5 translate-y-0.5 bg-[#d76b4d] align-middle animate-pulse" />
+              </span>
             </h1>
             <p className="max-w-xl text-base text-[#4c433c] md:text-lg">
               Find-me-something is the sophisticated sanctuary for digital artisans. We help creators of
