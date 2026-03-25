@@ -7,8 +7,8 @@ const envSchema = Joi.object({
   NODE_ENV: Joi.string().valid('development', 'test', 'production').default('development'),
   PORT: Joi.number().port().default(5000),
   MONGODB_URI: Joi.string().pattern(/^mongodb(\+srv)?:\/\//).required(),
-  JWT_PRIVATE_KEY_PATH: Joi.string().trim().required(),
-  JWT_PUBLIC_KEY_PATH: Joi.string().trim().required(),
+  JWT_PRIVATE_KEY: Joi.string().trim().required(),
+  JWT_PUBLIC_KEY: Joi.string().trim().required(),
   JWT_EXPIRES_IN: Joi.string().default('7d'),
   CORS_ORIGIN: Joi.string().default('*')
 }).unknown();
@@ -28,8 +28,8 @@ type EnvConfig = {
   NODE_ENV: NodeEnvironment;
   PORT: number;
   MONGODB_URI: string;
-  JWT_PRIVATE_KEY_PATH: string;
-  JWT_PUBLIC_KEY_PATH: string;
+  JWT_PRIVATE_KEY: string;
+  JWT_PUBLIC_KEY: string;
   JWT_EXPIRES_IN: string;
   CORS_ORIGIN: string;
 };

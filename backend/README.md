@@ -13,13 +13,19 @@ TypeScript + Express backend scaffold for **find-me-something**, a platform insp
 ## Getting started
 
 1. Copy `.env.example` to `.env` and update the values.
-2. Generate an RSA key pair for JWT signing:
+2. Put your RSA keys into `JWT_PRIVATE_KEY` and `JWT_PUBLIC_KEY` as PEM text with escaped newlines.
 
 ```bash
-mkdir -p keys
-openssl genpkey -algorithm RSA -out keys/jwt-private.pem -pkeyopt rsa_keygen_bits:2048
-openssl rsa -pubout -in keys/jwt-private.pem -out keys/jwt-public.pem
+JWT_PRIVATE_KEY="-----BEGIN RSA PRIVATE KEY-----\n...\n-----END RSA PRIVATE KEY-----"
+JWT_PUBLIC_KEY="-----BEGIN PUBLIC KEY-----\n...\n-----END PUBLIC KEY-----"
 ```
+If you already have PEM files, you can convert them into env-safe values with:
+
+```bash
+awk 'BEGIN{ORS=""} {gsub(/\r/,""); printf "%s\\n", $0}' keys/private.pem
+awk 'BEGIN{ORS=""} {gsub(/\r/,""); printf "%s\\n", $0}' keys/public.pem
+```
+
 3. Install dependencies:
 
 ```bash
